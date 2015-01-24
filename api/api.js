@@ -45,13 +45,13 @@ var jobs = ['Cook',
   'Toast Inspector'
 ];
 
-app.get('/jobs', function(req, res){
-    if(!req.headers.authorization){
-        return res.status(401).send({
-            message: 'You are not authorized'
-        })
-    }
-    res.json(jobs);
+app.get('/jobs', function(req, res) {
+  if (!req.headers.authorization) {
+    return res.status(401).send({
+      message: 'You are not authorized'
+    })
+  }
+  res.json(jobs);
 })
 
 mongoose.connect('mongodb://localhost/psjwt');
