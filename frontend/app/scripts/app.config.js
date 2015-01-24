@@ -11,4 +11,8 @@ angular
       templateUrl: '/views/register.html',
       controller: 'RegisterCtrl'
     });
+    $stateProvider.state('logout', {
+      url: '/logout',
+      controller: 'LogoutCtrl'
+    });
   });
