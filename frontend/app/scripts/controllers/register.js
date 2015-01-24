@@ -10,18 +10,18 @@
 angular.module('psJwtApp')
   .controller('RegisterCtrl', function($scope, $rootScope, $http, alert) {
 
+    $scope.submit = function() {
       var url = 'http://localhost:3000/register';
       var user = {
-        name: 'Alex'
+        email: $scope.email,
+        password: $scope.password
       };
-
-      $scope.submit = function() {
-        $http.post(url, user)
-          .success(function() {
-            alert('success', 'Cool!', 'You have been registered!');
-          })
-          .error(function() {
-            alert('warning', 'Opps!', 'Could not register!');
-          });
-      };
-    });
+      $http.post(url, user)
+        .success(function() {
+          alert('success', 'Cool!', 'You have been registered!');
+        })
+        .error(function() {
+          alert('warning', 'Opps!', 'Could not register!');
+        });
+    };
+  });

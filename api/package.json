@@ -9,7 +9,10 @@
   "author": "tairezzzz",
   "license": "ISC",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.10.2",
-    "express": "^4.11.1"
+    "crypto": "0.0.3",
+    "express": "^4.11.1",
+    "mongoose": "^3.8.21"
   }
 }
