@@ -6,6 +6,11 @@ angular
       url: '/',
       templateUrl: '/views/main.html'
     });
+    $stateProvider.state('jobs', {
+      url: '/jobs',
+      templateUrl: '/views/jobs.html',
+      controller: 'JobsCtrl'
+    });
     $stateProvider.state('register', {
       url: '/register',
       templateUrl: '/views/register.html',
