@@ -2,27 +2,27 @@
 
 /**
  * @ngdoc function
- * @name psJwtApp.controller:RegisterCtrl
+ * @name psJwtApp.controller:LoginCtrl
  * @description
- * # RegisterCtrl
+ * # LoginCtrl
  * Controller of the psJwtApp
  */
 angular.module('psJwtApp')
-  .controller('RegisterCtrl', function($scope, $rootScope, $http, alert, authToken, API_URL) {
+  .controller('LoginCtrl', function($scope, $http, API_URL, alert, authToken) {
     $scope.submit = function() {
-      var url = API_URL + 'register';
+      var url = API_URL + 'login';
       var user = {
         email: $scope.email,
         password: $scope.password
       };
-        
+
       $http.post(url, user)
         .success(function(res) {
-          alert('success', 'Account Created!', 'Welcome ' + res.user.email + '!');
+          alert('success', 'Welcome', 'Thanks for coming back ' + res.user.email + '!');
           authToken.setToken(res.token);
         })
-        .error(function() {
-          alert('warning', 'Opps!', 'Could not register!');
+        .error(function(err) {
+          alert('warning', 'Something went wrong :(', err.message);
         });
     };
   });
