@@ -8,18 +8,12 @@
  * Controller of the psJwtApp
  */
 angular.module('psJwtApp')
-  .controller('LoginCtrl', function($scope, $http, API_URL, alert, authToken) {
-    $scope.submit = function() {
-      var url = API_URL + 'login';
-      var user = {
-        email: $scope.email,
-        password: $scope.password
-      };
+  .controller('LoginCtrl', function($scope, alert, auth) {
 
-      $http.post(url, user)
+    $scope.submit = function() {
+      auth.login($scope.email, $scope.password)
         .success(function(res) {
           alert('success', 'Welcome', 'Thanks for coming back ' + res.user.email + '!');
-          authToken.setToken(res.token);
         })
         .error(function(err) {
           alert('warning', 'Something went wrong :(', err.message);

@@ -3,104 +3,115 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var User = require('./models/User.js');
 var jwt = require('jwt-simple');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
 var app = express();
 
 app.use(bodyParser.json());
+app.use(passport.initialize());
+
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+})
 
 app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  next();
+    next();
 })
+
+var strategy = new LocalStrategy({
+    usernameField: 'email'
+}, function(email, password, done) {
+    var searchUser = {
+        email: email
+    };
+
+    User.findOne(searchUser, function(err, user) {
+        if (err) {
+            return done(err);
+        }
+
+        if (!user) return done(null, false, {
+            message: 'Wrong email/password'
+        });
+
+        user.comparePasswords(password, function(err, isMatch) {
+            if (err) {
+                return done(err);
+            }
+            if (!isMatch) {
+                return done(null, false, {
+                    message: 'Wrong email/password'
+                });
+            }
+            return done(null, user);
+        })
+    })
+});
+
+passport.use(strategy);
 
 app.post('/register', function(req, res) {
-  var user = req.body;
+    var user = req.body;
 
-  var newUser = new User({
-    email: user.email,
-    password: user.password
-  });
+    var newUser = new User({
+        email: user.email,
+        password: user.password
+    });
 
-  newUser.save(function(err) {
-    createSendToken(newUser, res);
-  })
+    newUser.save(function(err) {
+        createSendToken(newUser, res);
+    })
 })
 
-app.post('/login', function(req, res) {
-  req.user = req.body;
-
-  console.log(req.user);
-  var searchUser = {
-    email: req.user.email
-  };
-
-  User.findOne(searchUser, function(err, user) {
-    if (err) {
-      throw err;
-    }
-
-    if (!user) {
-      return res.status(401).send({
-        message: 'Wrong email/password'
-      });
-    }
-    user.comparePasswords(req.user.password, function(err, isMatch) {
-      if (err) {
-        throw err;
-      }
-      if (!isMatch) {
-        return res.status(401).send({
-          message: 'Wrong email/password'
-        });
-      }
-      createSendToken(user, res);
-    })
-  })
+app.post('/login', passport.authenticate('local'), function(req, res) {
+    createSendToken(req.user, res);
 })
 
 function createSendToken(user, res) {
-  var payload = {
-    sub: user.id
-  }
+    var payload = {
+        sub: user.id
+    }
 
-  var token = jwt.encode(payload, 'shhh..');
+    var token = jwt.encode(payload, 'shhh..');
 
-  res.status(200).send({
-    user: user.toJSON(),
-    token: token
-  });
+    res.status(200).send({
+        user: user.toJSON(),
+        token: token
+    });
 }
 
 var jobs = ['Cook',
-  'SuperHero',
-  'Unicorn Whisperer',
-  'Toast Inspector'
+    'SuperHero',
+    'Unicorn Whisperer',
+    'Toast Inspector'
 ];
 
 app.get('/jobs', function(req, res) {
-  var token = req.headers.authorization.split(' ')[1];
-  var payload = jwt.decode(token, 'shhh..');
+    var token = req.headers.authorization.split(' ')[1];
+    var payload = jwt.decode(token, 'shhh..');
 
-  if (!req.headers.authorization) {
-    return res.status(401).send({
-      message: 'You are not authorized'
-    });
-  }
+    if (!req.headers.authorization) {
+        return res.status(401).send({
+            message: 'You are not authorized'
+        });
+    }
 
-  if (!payload.sub) {
-    res.status(401).send({
-      message: 'Authentication failed'
-    });
-  }
+    if (!payload.sub) {
+        res.status(401).send({
+            message: 'Authentication failed'
+        });
+    }
 
-  res.json(jobs);
+    res.json(jobs);
 })
 
 mongoose.connect('mongodb://localhost/psjwt');
 
 var server = app.listen(3000, function() {
-  console.log('api listening on ', server.address().port);
+    console.log('api listening on ', server.address().port);
 })
