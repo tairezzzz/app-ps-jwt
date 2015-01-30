@@ -19,4 +19,10 @@ angular.module('psJwtApp')
           alert('warning', 'Something went wrong :(', err.message);
         });
     };
+    
+    $scope.google = function(){
+        console.log('start');
+        auth.googleAuth().then();
+    };
+    
   });
