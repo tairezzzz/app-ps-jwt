@@ -1,6 +1,6 @@
 'use strict';
 angular
-  .module('psJwtApp').config(function($urlRouterProvider, $stateProvider, $httpProvider) {
+  .module('psJwtApp').config(function($urlRouterProvider, $stateProvider, $httpProvider, $authProvider, API_URL) {
     $urlRouterProvider.otherwise('/');
     $stateProvider.state('main', {
       url: '/',
@@ -24,6 +24,19 @@ angular
     $stateProvider.state('logout', {
       url: '/logout',
       controller: 'LogoutCtrl'
+    });
+
+    $authProvider.loginUrl = API_URL + 'login';
+    $authProvider.signupUrl = API_URL + 'register';
+
+    $authProvider.google({
+      clientId: '610266563015-uvlhpcrp87tscqbpq1vhp843cuajrvhj.apps.googleusercontent.com',
+      url: API_URL + 'auth/google'
+    });
+
+    $authProvider.facebook({
+      clientId: '765393453509704',
+      url: API_URL + 'auth/facebook'
     });
 
     $httpProvider.interceptors.push('authInterceptor');

@@ -5,6 +5,7 @@ var UserSchema = new mongoose.Schema({
   email: String,
   password: String,
   googleId: String,
+  facebookId: String,
   displayName: String
 });
 
@@ -16,8 +17,6 @@ UserSchema.methods.toJSON = function() {
 };
 
 UserSchema.methods.comparePasswords = function(password, callback) {
-  console.log(password);
-  console.log(this.password);
   bcrypt.compare(password, this.password, callback);
 }
 

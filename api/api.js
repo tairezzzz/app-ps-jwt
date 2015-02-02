@@ -1,4 +1,5 @@
 var express = require('express');
+var cors = require('cors');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var User = require('./models/User.js');
@@ -6,6 +7,8 @@ var jwt = require('jwt-simple');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var request = require('request');
+var createSendToken = require('./services/jwt.js')
+var facebookAuth = require('./services/facebookAuth.js');
 
 var app = express();
 
@@ -16,13 +19,15 @@ passport.serializeUser(function(user, done) {
   done(null, user.id);
 })
 
-app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  next();
-})
+var whitelist = ['http://localhost:9000'];
+app.use(cors({
+  origin: function(origin, callback) {
+    var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+    callback(null, originIsWhitelisted);
+  },
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+}));
 
 var strategyOptions = {
   usernameField: 'email'
@@ -94,18 +99,7 @@ app.post('/login', passport.authenticate('local-login'), function(req, res) {
   createSendToken(req.user, res);
 })
 
-function createSendToken(user, res) {
-  var payload = {
-    sub: user.id
-  }
-
-  var token = jwt.encode(payload, 'shhh..');
-
-  res.status(200).send({
-    user: user.toJSON(),
-    token: token
-  });
-}
+app.post('/auth/facebook', facebookAuth);
 
 var jobs = ['Cook',
   'SuperHero',
