@@ -26,8 +26,8 @@ angular
       controller: 'LogoutCtrl'
     });
 
-    $authProvider.loginUrl = API_URL + 'login';
-    $authProvider.signupUrl = API_URL + 'register';
+    $authProvider.loginUrl = API_URL + 'auth/login';
+    $authProvider.signupUrl = API_URL + 'auth/register';
 
     $authProvider.google({
       clientId: '610266563015-uvlhpcrp87tscqbpq1vhp843cuajrvhj.apps.googleusercontent.com',
@@ -42,7 +42,7 @@ angular
     $httpProvider.interceptors.push('authInterceptor');
 
   })
-  .constant('API_URL', 'http://localhost:3000/')
+  .constant('API_URL', 'http://localhost:1337/')
 
 .run(function($window) {
   var params = $window.location.search.substring(1);
